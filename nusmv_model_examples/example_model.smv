@@ -1,0 +1,19 @@
+MODULE COUNTER(is_time_to_move)
+VAR 
+   state  	: 0 .. 12;
+ASSIGN
+   init(state) := 0;
+   next(state) := is_time_to_move ? (state + 1) mod 10 : state;
+
+INVARSPEC state < 10
+
+MODULE main
+VAR 
+  is_time_to_move: boolean;
+  counter_1 : COUNTER(is_time_to_move);
+  counter_2 : COUNTER(!is_time_to_move);
+ASSIGN 
+  init(is_time_to_move) := TRUE;
+
+
+   
