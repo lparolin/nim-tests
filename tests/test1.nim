@@ -87,3 +87,18 @@ test "get iteration_lines when it is not":
 test "get iteration_lines when it is":
   check isIterationLine("  -> State: 1.3 <-  ") == true
 
+test "get iteration number when 3":
+  check getIterationNumber("  -> State: 1.3 <-  ") == 3
+
+test "get iteration number when 1":
+  check getIterationNumber("  -> State: 1.1 <-  ") == 1
+
+test "get iteration number when 21":
+  check getIterationNumber("  -> State: 1.21 <-  ") == 21
+
+test "get trace number when 1":
+  check getTraceNumber("  -> State: 1.3 <-  ") == 1
+
+test "get trace number when 3":
+  check getTraceNumber("  -> State: 3.1 <-  ") == 3
+
