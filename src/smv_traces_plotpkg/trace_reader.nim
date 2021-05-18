@@ -4,13 +4,14 @@ import nre
 import system
 import tables 
 import hashes
+import options
 
 type EntryType* = enum 
     nkInt, 
     nkString,
     nkBool
 
-type GenericEntry = object 
+type GenericEntry* = object 
   case kind*: EntryType
   of nkInt: 
     intVal: int
@@ -81,46 +82,51 @@ func isIterationLine*(instring: string) : bool =
 
 proc getNumberOfSteps*(instream : Stream) : int = 
   var line : string 
-  return 2
+  var number_of_steps = 0
+  while instream.readLine(line):
+    if isIterationLine(line) :
+      number_of_steps = getIterationNumber(line)
+  if number_of_steps > 0:
+    return number_of_steps
+  else:
+    raise newException(ValueError, "Unable to get number of steps from the steam")
 
-
-proc getDataChunk*(instream: string): Table[string, GenericEntry] = 
-  var line = ""
-  var strm = newStringStream(instream)
-  let parser = re"([^\s]+)\s*=\s*([^\s]+)"
-  var temp_data = initTable[string, GenericEntry]()
-  while strm.readLine(line):
-    echo "line: " & line
-    let match = line.find(parser)
-    if match.isSome():
-      let variable_name = match.get.captures[0]
-      let value = match.get.captures[1]
-      temp_data[variable_name] = makeEntry(0)
-    else:
-      echo "No variable found"
-  return temp_data
-
+proc id(input: string): string = 
+  return input 
 
 proc parseValue*(raw_value: string): GenericEntry = 
   let parsable_value = raw_value.toLowerAscii()
   let parser_caller_pairs = (
                 (re"\s*(\d+)\s*", parseInt), 
-                (re"\s*(true|false)\s*", parseBool)
+                (re"\s*(true|false)\s*", parseBool),
+                (re"\s*([^\s]+)\s*", id)
                 )
 
   for i_pair in parser_caller_pairs.fields: 
-    let parser = i_pair[0]
-    let caller = i_pair[1] 
-    let match = parsable_value.find(parser)
+    let matcher = i_pair[0]
+    let parser = i_pair[1] 
+    let match = parsable_value.find(matcher)
     if match.isSome():
-      let parsed_value = caller(match.get.captures[0])
+      let parsed_value = parser(match.get.captures[0])
       return makeEntry(parsed_value)
 
   raise newException(ValueError, "Unable to parse the data: " & raw_value)
 
 
+proc getDataChunk*(strm: Stream): Table[string, GenericEntry] = 
+  var line = ""
+  let parser = re"([^\s]+)\s*=\s*([^\s]+)"
+  var temp_data = initTable[string, GenericEntry]()
+  while strm.readLine(line) and not isIterationLine(line) :
+    let match = line.find(parser)
+    if match.isSome():
+      let variable_name = match.get.captures[0]
+      let value = match.get.captures[1]
+      temp_data[variable_name] = parseValue(value)
+  return temp_data
 
-proc getDataChunk*(trace_index: int, step_index: int, instream: string) : Table[string, GenericEntry] = 
+
+proc getDataChunk*(trace_index: int, step_index: int, instream: string) : Option[Table[string, GenericEntry]] = 
   var strm = newStringStream(instream)
   var line = ""
   while strm.readLine(line):
@@ -129,10 +135,9 @@ proc getDataChunk*(trace_index: int, step_index: int, instream: string) : Table[
       let actual_trace_index = getTraceNumber(line)
       if step_index == actual_step_index and 
         trace_index == actual_trace_index:
-        echo "Found..."
-        #let new_data = getDataChunk(strm)
-        #echo new_data
-  return {"a": GenericEntry(kind: nkInt, intVal: 0)}.toTable
+        return  some(getDataChunk(strm))
+  
+
 
 
 

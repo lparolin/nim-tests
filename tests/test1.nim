@@ -9,6 +9,8 @@ import unittest
 import streams 
 import tables
 import smv_traces_plotpkg/trace_reader
+import options
+
 
 let in_data = """
 ********  Simulation Starting From State 1.1   ********
@@ -77,7 +79,7 @@ Trace Type: Simulation
   """
  
 
-test "get variables":
+test "get number of steps":
  
   check getNumberOfSteps(newStringStream(in_data)) == 15 
 
@@ -102,21 +104,33 @@ test "get trace number when 1":
 test "get trace number when 3":
   check getTraceNumber("  -> State: 3.1 <-  ") == 3
 
-#test "get chunk of data":
-#  check getDataChunk(1, 1, in_data) == {
-#    "is_time_to_move": makeEntry(true), 
-#    "counter_1.state": makeEntry(0),
-#    "counter_2.state": makeEntry(0)
-#    }.toTable
+test "get chunk of data when 1, 1":
+  check getDataChunk(1, 1, in_data) == some({
+    "is_time_to_move": makeEntry(true), 
+    "counter_1.state": makeEntry(0),
+    "counter_2.state": makeEntry(0)
+    }.toTable)
 
-#test "get chunk of data in block":
-#  let indata = """
-#    counter_1.state = 0
-#  """ 
-#
-#  check getDataChunk(in_data) == {
-#    "counter_1.state": makeEntry(0),
-#    }.toTable
+test "get chunk of data when 1, 3":
+  check getDataChunk(1, 3, in_data) == some({
+    "is_time_to_move": makeEntry(true), 
+    "counter_1.state": makeEntry(1),
+    "counter_2.state": makeEntry(1)
+    }.toTable)
+
+test "get chunk of data when 1, 3":
+  check getDataChunk(2, 3, in_data) == none(Table[string, GenericEntry])
+
+
+
+test "get chunk of data in block":
+  let indata = """
+    counter_1.state = 0
+  """ 
+
+  check getDataChunk(newStringStream(in_data)) == {
+    "counter_1.state": makeEntry(0),
+    }.toTable
 
 test "parsable value when boolean true":
   check parseValue("  true   ") == makeEntry(true)
@@ -127,3 +141,12 @@ test "parsable value when boolean false":
 
 test "parsable value when integer 0 ":
   check parseValue("  0 ") == makeEntry(0)
+
+test "parsable value when simple string ":
+  check parseValue("  lambda.one ") == makeEntry("lambda.one")
+
+test "parsable value when complex string ":
+  check parseValue("  lambda_one_two") == makeEntry("lambda_one_two")
+
+
+  
