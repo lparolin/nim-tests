@@ -84,5 +84,55 @@ proc getNumberOfSteps*(instream : Stream) : int =
   return 2
 
 
+proc getDataChunk*(instream: string): Table[string, GenericEntry] = 
+  var line = ""
+  var strm = newStringStream(instream)
+  let parser = re"([^\s]+)\s*=\s*([^\s]+)"
+  var temp_data = initTable[string, GenericEntry]()
+  while strm.readLine(line):
+    echo "line: " & line
+    let match = line.find(parser)
+    if match.isSome():
+      let variable_name = match.get.captures[0]
+      let value = match.get.captures[1]
+      temp_data[variable_name] = makeEntry(0)
+    else:
+      echo "No variable found"
+  return temp_data
+
+
+proc parseValue*(raw_value: string): GenericEntry = 
+  let parsable_value = raw_value.toLowerAscii()
+  let parser_caller_pairs = (
+                (re"\s*(\d+)\s*", parseInt), 
+                (re"\s*(true|false)\s*", parseBool)
+                )
+
+  for i_pair in parser_caller_pairs.fields: 
+    let parser = i_pair[0]
+    let caller = i_pair[1] 
+    let match = parsable_value.find(parser)
+    if match.isSome():
+      let parsed_value = caller(match.get.captures[0])
+      return makeEntry(parsed_value)
+
+  raise newException(ValueError, "Unable to parse the data: " & raw_value)
+
+
+
 proc getDataChunk*(trace_index: int, step_index: int, instream: string) : Table[string, GenericEntry] = 
+  var strm = newStringStream(instream)
+  var line = ""
+  while strm.readLine(line):
+    if isIterationLine(line):
+      let actual_step_index = getIterationNumber(line)
+      let actual_trace_index = getTraceNumber(line)
+      if step_index == actual_step_index and 
+        trace_index == actual_trace_index:
+        echo "Found..."
+        #let new_data = getDataChunk(strm)
+        #echo new_data
   return {"a": GenericEntry(kind: nkInt, intVal: 0)}.toTable
+
+
+

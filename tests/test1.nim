@@ -7,13 +7,10 @@
 
 import unittest
 import streams 
-
+import tables
 import smv_traces_plotpkg/trace_reader
 
-
-
-test "get variables":
-  let in_data = """
+let in_data = """
 ********  Simulation Starting From State 1.1   ********
 Trace Description: Simulation Trace 
 Trace Type: Simulation 
@@ -78,7 +75,10 @@ Trace Type: Simulation
     counter_1.state = 5
     counter_2.state = 9
   """
-  
+ 
+
+test "get variables":
+ 
   check getNumberOfSteps(newStringStream(in_data)) == 15 
 
 test "get iteration_lines when it is not":
@@ -102,3 +102,28 @@ test "get trace number when 1":
 test "get trace number when 3":
   check getTraceNumber("  -> State: 3.1 <-  ") == 3
 
+#test "get chunk of data":
+#  check getDataChunk(1, 1, in_data) == {
+#    "is_time_to_move": makeEntry(true), 
+#    "counter_1.state": makeEntry(0),
+#    "counter_2.state": makeEntry(0)
+#    }.toTable
+
+#test "get chunk of data in block":
+#  let indata = """
+#    counter_1.state = 0
+#  """ 
+#
+#  check getDataChunk(in_data) == {
+#    "counter_1.state": makeEntry(0),
+#    }.toTable
+
+test "parsable value when boolean true":
+  check parseValue("  true   ") == makeEntry(true)
+
+
+test "parsable value when boolean false":
+  check parseValue("  false   ") == makeEntry(false)
+
+test "parsable value when integer 0 ":
+  check parseValue("  0 ") == makeEntry(0)
