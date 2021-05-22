@@ -19,7 +19,7 @@ func getName*(in_chunk: DataChunk): string =
   return in_chunk.name
 
 func getValue*[T](in_chunk: DataChunk): T =
-  return in_chunk.data
+  return in_chunk.data.getValue()
 
 func getTraceId*(in_chunk: DataChunk): int =
   return in_chunk.trace_id
