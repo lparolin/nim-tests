@@ -60,17 +60,16 @@ proc id(input: string): string =
 
 
 proc parseValue*(raw_value: string): GenericEntry =
-  let parsable_value = raw_value.toLowerAscii()
   let parser_caller_pairs = (
                 (re"\s*(\d+)\s*", parseInt),
-                (re"\s*(true|false)\s*", parseBool),
+                (re"(?i)\s*(true|false)\s*", parseBool),
                 (re"\s*([^\s]+)\s*", id)
                   )
 
   for i_pair in parser_caller_pairs.fields:
     let matcher = i_pair[0]
     let parser = i_pair[1]
-    let match = parsable_value.find(matcher)
+    let match = raw_value.find(matcher)
     if match.isSome():
       let parsed_value = parser(match.get.captures[0])
       return makeEntry(parsed_value)

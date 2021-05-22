@@ -29,14 +29,20 @@ test "test equality when same type and identical content":
 test "parsable value when boolean true":
   check parseValue("  true   ") == makeEntry(true)
 
+test "parsable value when boolean true and capital letter":
+  check parseValue("  TRUE   ") == makeEntry(true)
+
 test "parsable value when boolean false":
   check parseValue("  false   ") == makeEntry(false)
+
+test "parsable value when boolean false and capital letter":
+  check parseValue("  FALSE   ") == makeEntry(false)
 
 test "parsable value when integer 0 ":
   check parseValue("  0 ") == makeEntry(0)
 
 test "parsable value when simple string ":
-  check parseValue("  lambda.one ") == makeEntry("lambda.one")
+  check parseValue("  Lambda.One ") == makeEntry("Lambda.One")
 
 test "parsable value when complex string ":
   check parseValue("  lambda_one_two") == makeEntry("lambda_one_two")
