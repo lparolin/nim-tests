@@ -6,6 +6,15 @@ type DataChunk* = object
   trace_id: int
   step_id: int
 
+func MakeDataChunk*[T](name: string, data: T, trace_id: int,
+    step_id: int): DataChunk =
+  return DataChunk(name: name, data: makeEntry(data), trace_id: trace_id,
+      step_id: step_id)
+
+func MakeDataChunk*(name: string, data: GenericEntry, trace_id: int,
+    step_id: int): DataChunk =
+  return DataChunk(name: name, data: data, trace_id: trace_id, step_id: step_id)
+
 func getName*(in_chunk: DataChunk): string =
   return in_chunk.name
 
