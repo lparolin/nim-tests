@@ -1,9 +1,9 @@
 import smv_traces_plotpkg/trace_parser
 import smv_traces_plotpkg/data_chunk
 import streams
-#import sequtils
-#import smv_traces_plotpkg/trace
-#import norm/sqlite
+import sequtils
+import smv_traces_plotpkg/trace
+import norm/sqlite
 
 when isMainModule:
   let in_file = r"nusmv_model_examples/trace_example1.tr"
@@ -17,13 +17,10 @@ when isMainModule:
   for i_data in out_data.items:
     out_stream.writeLine(i_data.transformToCsvLine())
 
-  #var sql_data = map(out_data, newTrace)
-  #dumpData(sql_data, out_stream)
+  echo "CSV file created"
 
-  echo "Work executed"
-
-  #let out_db = r"outdata.db"
-  #let dbConn = open(out_db, "", "", "")
-  #dbConn.createTables(Trace())
-  #var sql_data = map(out_data, newTrace)
-  #dumpData(sql_data, dbConn)
+  let out_db = r"outdata.db"
+  var dbConn = open(out_db, "", "", "")
+  dbConn.createTables(Trace())
+  var sql_data = map(out_data, newTrace)
+  insertData(sql_data, dbConn)
