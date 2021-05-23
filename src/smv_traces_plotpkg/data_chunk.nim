@@ -37,3 +37,23 @@ func `==`*(a: DataChunk, b: DataChunk): bool =
 
 func getType*(in_data: DataChunk): EntryType =
   return in_data.data.getType
+
+proc getValue*[T](in_data: DataChunk, out_data: var T): bool =
+  return getValue(in_data.data, out_data)
+
+func getHeaderForCsvOutput*(): string =
+  return "name, value, trace_id, step_id"
+
+func transformToCsvLine*(in_data: DataChunk): string =
+  let name_string = "\"" & in_data.name & "\""
+  var value_string: string
+  let successful_translated = getValue(in_data, value_string)
+  if not successful_translated:
+    raise newException(ValueError, "Unable to parse data")
+  if not (in_data.getType() == nkInt):
+    value_string = "\"" & value_string & "\""
+
+  let trace_id = $in_data.trace_id
+  let step_id = $in_data.step_id
+
+  return name_string & ", " & value_string & ", " & trace_id & ", " & step_id
