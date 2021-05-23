@@ -47,4 +47,45 @@ test "parsable value when simple string ":
 test "parsable value when complex string ":
   check parseValue("  lambda_one_two") == makeEntry("lambda_one_two")
 
+test "get value when integer 10 and request is integer":
+  var new_value: int
+  check getValue(makeEntry(10), new_value) == true
+  check new_value == 10
+
+test "get value when integer 10 and request is boolean":
+  var new_value: bool
+  check getValue(makeEntry(10), new_value) == false
+
+test "get value when integer 10 and request is string":
+  var new_value: string
+  check getValue(makeEntry(10), new_value) == true
+  check new_value == "10"
+
+test "get value when string and request is integer":
+  var new_value: int
+  check getValue(makeEntry("test"), new_value) == false
+
+test "get value when string and request is boolean":
+  var new_value: bool
+  check getValue(makeEntry("test"), new_value) == false
+
+test "get value when string and request is string":
+  var new_value: string
+  check getValue(makeEntry("test"), new_value) == true
+  check new_value == "test"
+
+test "get value when bool and request is integer":
+  var new_value: int
+  check getValue(makeEntry(true), new_value) == false
+
+test "get value when bool and request is boolean":
+  var new_value = false
+  check getValue(makeEntry(true), new_value) == true
+  check new_value == true
+
+test "get value when bool and request is string":
+  var new_value: string
+  check getValue(makeEntry(true), new_value) == true
+  new_value = "true"
+
 

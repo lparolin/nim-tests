@@ -37,14 +37,30 @@ proc `==`*(a: GenericEntry, b: GenericEntry): bool =
     of nkBool:
       return a.boolVal == b.boolVal
 
-proc getValue*[T](a: GenericEntry): T =
+func getType*(a: GenericEntry): EntryType =
+  return a.kind
+
+proc getValue*(a: GenericEntry, out_data: var int): bool =
+  if a.kind == nkInt:
+    out_data = a.intVal
+    return true
+  return false
+
+proc getValue*(a: GenericEntry, out_data: var string): bool =
   case a.kind:
-    of nkInt:
-      return a.intVal
     of nkString:
-      return a.stringVal
+      out_data = a.stringVal
     of nkBool:
-      return a.boolVal
+      out_data = $a.boolVal
+    of nkInt:
+      out_data = $a.intVal
+  return true
+
+proc getValue*(a: GenericEntry, out_data: var bool): bool =
+  if a.kind == nkBool:
+    out_data = a.boolVal
+    return true
+  return false
 
 proc makeEntry*(value: int): GenericEntry =
   return GenericEntry(kind: nkInt, intVal: value)

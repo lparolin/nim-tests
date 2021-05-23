@@ -4,6 +4,7 @@ import nre
 import system
 import generic_entry
 import data_chunk
+import sequtils
 
 const iteration_line_matcher_string = "\\s*-> State:\\s+(\\d+)\\.(\\d+)\\s<-"
 
@@ -63,4 +64,14 @@ proc getDataChunk*(trace_index: int, step_index: int, strm: Stream): seq[DataChu
       if step_index == actual_step_index and
         trace_index == actual_trace_index:
         return parseDataChunk(trace_index, step_index, strm)
+
+proc parseAllStream*(strm: Stream): seq[DataChunk] =
+  var line = ""
+  while strm.readLine(line):
+    if isIterationLine(line):
+      let step_index = getIterationNumber(line)
+      let trace_index = getTraceNumber(line)
+      result = concat(result, parseDataChunk(trace_index, step_index, strm))
+
+
 

@@ -1,5 +1,7 @@
 import generic_entry, hashes
 
+export EntryType
+
 type DataChunk* = object
   name: string
   data: GenericEntry
@@ -18,9 +20,6 @@ func MakeDataChunk*(name: string, data: GenericEntry, trace_id: int,
 func getName*(in_chunk: DataChunk): string =
   return in_chunk.name
 
-func getValue*[T](in_chunk: DataChunk): T =
-  return in_chunk.data.getValue()
-
 func getTraceId*(in_chunk: DataChunk): int =
   return in_chunk.trace_id
 
@@ -35,3 +34,6 @@ func hash*(in_chunk: DataChunk): Hash =
 func `==`*(a: DataChunk, b: DataChunk): bool =
   return a.name == b.name and a.data == b.data and a.trace_id == b.trace_id and
       a.step_id == b.step_id
+
+func getType*(in_data: DataChunk): EntryType =
+  return in_data.data.getType

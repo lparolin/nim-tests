@@ -12,3 +12,4 @@ bin           = @["smv_traces_plot"]
 # Dependencies
 
 requires "nim >= 0.19.4"
+requires "norm"
