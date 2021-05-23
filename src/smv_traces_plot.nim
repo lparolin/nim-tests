@@ -2,7 +2,7 @@ import smv_traces_plotpkg/trace_parser
 import smv_traces_plotpkg/data_chunk
 import streams
 import sequtils
-import smv_traces_plotpkg/trace
+import smv_traces_plotpkg/sql_trace
 import norm/sqlite
 
 when isMainModule:
@@ -21,6 +21,6 @@ when isMainModule:
 
   let out_db = r"outdata.db"
   var dbConn = open(out_db, "", "", "")
-  dbConn.createTables(Trace())
-  var sql_data = map(out_data, newTrace)
+  dbConn.createTables(SqlTrace())
+  var sql_data = map(out_data, newSqlTrace)
   insertData(sql_data, dbConn)
