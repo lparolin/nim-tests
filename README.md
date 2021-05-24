@@ -16,9 +16,9 @@ The application generates two files: `output.csv` and `output.db`
 
 # Next planned features
 
-  - [] Allow use of non-verbose trace input files
-  - [] Allow users to select file name for the input file trace 
-  - [] Allow users to specific output file location and format, i.e. sqlite, or
+  - [  ] Allow use of non-verbose trace input files
+  - [  ] Allow users to select file name for the input file trace 
+  - [  ] Allow users to specific output file location and format, i.e. sqlite, or
     csv, or sqlite and csv 
-  - [] Allow generation of plots from the library
+  - [  ] Allow generation of plots from the library
 
